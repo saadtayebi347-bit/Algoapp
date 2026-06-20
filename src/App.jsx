@@ -153,13 +153,19 @@ const GlobalStyle = () => (
       /* ── Énoncé — mise en forme professionnelle ── */
       .enonce-container {
         font-family: 'Nunito', sans-serif;
-        font-size: 15px;
-        line-height: 1.9;
-        color: #cbd5e1;
+        font-size: 15.5px;
+        line-height: 1.75;
+        letter-spacing: 0.1px;
+        color: #d4dbe6;
         word-break: break-word;
       }
       .enonce-container p {
-        margin: 0 0 10px 0;
+        margin: 0 0 12px 0;
+      }
+      .enonce-container br {
+        content: "";
+        display: block;
+        margin-top: 10px;
       }
       .enonce-container .math-block {
         display: block;
@@ -168,13 +174,44 @@ const GlobalStyle = () => (
         border-left: 3px solid #6366f1;
         border-radius: 10px;
         padding: 14px 18px;
-        margin: 14px 0;
+        margin: 16px 0;
         text-align: center;
         overflow-x: auto;
       }
       .enonce-container .math-inline {
         display: inline;
         padding: 1px 3px;
+      }
+
+      /* ── Grille question / éditeur — responsive ── */
+      .question-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.6fr;
+        gap: 16px;
+      }
+      .enonce-box {
+        padding: 20px 22px;
+      }
+      .question-card {
+        padding: 22px 24px;
+      }
+      @media (max-width: 900px) {
+        .question-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+      }
+      @media (max-width: 640px) {
+        .enonce-container {
+          font-size: 14.5px;
+          line-height: 1.65;
+        }
+        .enonce-box {
+          padding: 16px 16px;
+        }
+        .question-card {
+          padding: 16px 18px;
+        }
       }
     `}</style>
   </>
@@ -1036,7 +1073,6 @@ const CodeEditor = memo(({ value, onChange, language, readOnly = false }) => {
 // ─── BARRE DE PROGRESSION ────────────────────────────────────────────────────
 const ProgressBar = ({ current, total, timeLeft, totalTime }) => {
   const pct = Math.round((current / total) * 100);
-  const timePct = Math.max(0, (timeLeft / (totalTime * 60)) * 100);
   const timeColor = timeLeft < 600 ? "#EF4444" : timeLeft < 1800 ? "#F59E0B" : "#10B981";
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -1051,12 +1087,6 @@ const ProgressBar = ({ current, total, timeLeft, totalTime }) => {
           height: "100%", width: `${pct}%`,
           background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
           borderRadius: 3, transition: "width 0.4s ease",
-        }} />
-      </div>
-      <div style={{ height: 4, background: "#1a1a2e", borderRadius: 2, overflow: "hidden" }}>
-        <div style={{
-          height: "100%", width: `${timePct}%`,
-          background: timeColor, borderRadius: 2, transition: "width 1s linear",
         }} />
       </div>
     </div>
@@ -1422,20 +1452,14 @@ const ExamScreen = ({ student, onSubmit }) => {
 
         {/* MAIN AREA */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
-          {/* Dashboard stats */}
-          <div style={{ padding: "8px 20px", borderBottom: "1px solid #1a1a2e", flexShrink: 0 }}>
-            <StudentDashboard student={student} answers={answers} questions={questions} timeLeft={timeLeft} totalTime={totalTime} />
-          </div>
-
           {/* Question + Éditeur */}
-          <div style={{ flex: 1, overflow: "auto", padding: "16px 20px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1.6fr", gap: 16, minHeight: 0 }}>
+          <div style={{ flex: 1, overflow: "auto", padding: "12px 20px 16px" }}>
+            <div className="question-grid" style={{ minHeight: 0 }}>
               {/* Énoncé */}
-              <div style={{
+              <div className="question-card" style={{
                 background: "linear-gradient(160deg, #0d0d1f 0%, #0a0a18 100%)",
                 border: "1px solid #1e1e3a",
                 borderRadius: 16,
-                padding: "22px 24px",
                 overflow: "auto",
                 boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
                 display: "flex", flexDirection: "column", gap: 0,
@@ -1456,9 +1480,9 @@ const ExamScreen = ({ student, onSubmit }) => {
                     </div>
                     {/* Titre */}
                     <h2 style={{
-                      fontSize: 18, fontWeight: 800, color: "#f1f5f9",
-                      lineHeight: 1.35, margin: 0,
-                      fontFamily: "'Nunito', sans-serif", letterSpacing: "-0.2px",
+                      fontSize: 19.5, fontWeight: 800, color: "#f8fafc",
+                      lineHeight: 1.4, margin: 0,
+                      fontFamily: "'Nunito', sans-serif", letterSpacing: "-0.3px",
                     }}>
                       {currentQ.titre}
                     </h2>
@@ -1480,17 +1504,18 @@ const ExamScreen = ({ student, onSubmit }) => {
                 <div style={{ height: 1, background: "linear-gradient(90deg, rgba(99,102,241,0.3), transparent)", marginBottom: 18 }} />
 
                 {/* Énoncé avec rendu LaTeX */}
-                <div style={{
+                <div className="enonce-box" style={{
                   flex: 1,
                   background: "rgba(99,102,241,0.04)",
                   border: "1px solid rgba(99,102,241,0.1)",
                   borderRadius: 12,
-                  padding: "18px 20px",
                 }}>
                   <div style={{
-                    fontSize: 11, fontWeight: 800, letterSpacing: 1.2,
-                    textTransform: "uppercase", color: "#4f46e5",
-                    marginBottom: 12, fontFamily: "'Nunito', sans-serif",
+                    fontSize: 11.5, fontWeight: 800, letterSpacing: 1.3,
+                    textTransform: "uppercase", color: "#a5b4fc",
+                    marginBottom: 14, paddingBottom: 10,
+                    borderBottom: "1px solid rgba(99,102,241,0.15)",
+                    fontFamily: "'Nunito', sans-serif",
                   }}>
                     📋 Énoncé
                   </div>
